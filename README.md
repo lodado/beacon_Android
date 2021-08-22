@@ -41,5 +41,5 @@ AT+RESET ß 리붓하여 반영
 
 https://github.com/AltBeacon/android-beacon-library
 
-이 레포지토리는 백업용으로 생성된 파일이고, gitlab에 나머지 부분은 추가되어 있습니다.
+이 레포지토리는 백업용으로 생성된 파일이고, gitlab에 나머지 부분은 계속 업데이트 되어 있습니다.
 
