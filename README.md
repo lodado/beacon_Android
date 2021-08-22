@@ -10,6 +10,10 @@
 
 주변 비콘의 정보와 거리를 log로 출력합니다.
 
+코드 설명
+
+https://blog.naver.com/ycp998/222480208630
+
 ## target SDK
 
 target 29
