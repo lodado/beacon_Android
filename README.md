@@ -1,5 +1,7 @@
 # beacon_Android
 
+한이음 공모전 beacon 부분 코드
+
 비콘 foreground 서비스만 추가한 예제입니다.
 
 ## HM-10 (아두이노) 사용
