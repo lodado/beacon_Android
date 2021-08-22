@@ -22,13 +22,13 @@ import org.altbeacon.beacon.Region;
 
 import java.util.Collection;
 
-public class MainActivity_Beacon extends AppCompatActivity {
+public class ForegroundService extends AppCompatActivity {
 
     final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
 
     TextView textView;
 
-    protected static final String TAG = "MainActivity_Beacon";
+    protected static final String TAG = "ForegroundService";
     private BeaconManager beaconManager;
 
     @Override
@@ -52,37 +52,41 @@ public class MainActivity_Beacon extends AppCompatActivity {
         beaconManager.setRegionStatePersistenceEnabled(false);
 
         beaconManager.addMonitorNotifier(new MonitorNotifier() {
+
+            //들어올때 인식
             @Override
             public void didEnterRegion(Region region) {
                 Log.i(TAG, "I just saw an beacon for the first time!" + this);
 
                 //textView.setText("Beacon wtf connected");
-                //beaconManager.startRangingBeacons(region);
+
+                //인식되면 range, identify 시작
+                beaconManager.startRangingBeacons(region);
             }
 
+            //나갈때 인식
             @Override
             public void didExitRegion(Region region) {
                 Log.i(TAG, "I no longer see an beacon");
-
-                //textView.setText("Beacon wtf exit");
 
             }
 
             @Override
             public void didDetermineStateForRegion(int state, Region region) {
                 Log.i(TAG, "I have just switched from seeing/not seeing beacons: " + state + region);
-                //textView = findViewById(R.id.tv_message);
-                //textView.setText("Beacon wtf wait"+state+region);
+
             }
         });
 
         beaconManager.addRangeNotifier(new RangeNotifier() {
+
+            //인식되면 range, identify 시작
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-                //while (beacons.iterator().hasNext()) {
-                //     Log.i(TAG, "The first beacon I see is about "+beacons.iterator().next()+" meters away.");
-                //    //
-                // }
+                for (Beacon beacon: beacons)  {
+                    Log.i(TAG, "This beacon has identifiers:"+beacon.getId1()+", "+beacon.getId2()+", "+beacon.getId3());
+                    Log.i(TAG, "This beacon is far away from "+beacon.getDistance()+"m");
+                }
 
                 Log.i(TAG, "done");
             }
