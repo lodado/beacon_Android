@@ -1,12 +1,12 @@
 package com.example.myapplicationtest;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
-import android.annotation.TargetApi;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +24,8 @@ import java.util.Collection;
 
 public class MainActivity_Beacon extends AppCompatActivity {
 
+    final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
+
     TextView textView;
 
     protected static final String TAG = "MainActivity_Beacon";
@@ -32,7 +34,9 @@ public class MainActivity_Beacon extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_foreground);
+
+        permissionCheck();
 
         textView = findViewById(R.id.tv_message);
 
@@ -50,10 +54,10 @@ public class MainActivity_Beacon extends AppCompatActivity {
         beaconManager.addMonitorNotifier(new MonitorNotifier() {
             @Override
             public void didEnterRegion(Region region) {
-                Log.i(TAG, "I just saw an beacon for the first time!"+this);
+                Log.i(TAG, "I just saw an beacon for the first time!" + this);
 
                 //textView.setText("Beacon wtf connected");
-
+                //beaconManager.startRangingBeacons(region);
             }
 
             @Override
@@ -66,16 +70,78 @@ public class MainActivity_Beacon extends AppCompatActivity {
 
             @Override
             public void didDetermineStateForRegion(int state, Region region) {
-                Log.i(TAG, "I have just switched from seeing/not seeing beacons: "+state + region);
+                Log.i(TAG, "I have just switched from seeing/not seeing beacons: " + state + region);
                 //textView = findViewById(R.id.tv_message);
                 //textView.setText("Beacon wtf wait"+state+region);
-
             }
         });
+
+        beaconManager.addRangeNotifier(new RangeNotifier() {
+            @Override
+            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
+                //while (beacons.iterator().hasNext()) {
+                //     Log.i(TAG, "The first beacon I see is about "+beacons.iterator().next()+" meters away.");
+                //    //
+                // }
+
+                Log.i(TAG, "done");
+            }
+        });
+
         //"74278bda-b644-4520-8f0c-720eaf059935"
         beaconManager.startMonitoring(new Region("myMonitoringUniqueId", null, null, null));
 
     }
+
+    //위치 permission이 부여되야 한다.
+    public void permissionCheck(){
+        if ( Build.VERSION.SDK_INT >= 23){
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) !=
+                    PackageManager.PERMISSION_GRANTED  ){
+                requestPermissions(new String[]{
+                                android.Manifest.permission.ACCESS_FINE_LOCATION},
+                        REQUEST_CODE_ASK_PERMISSIONS);
+                return;
+            }
+        }
+        getLocation();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_PERMISSIONS:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getLocation();
+                } else {
+                    // Permission Denied
+                    Toast.makeText(this, "access denied", Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    //Get location
+    public void getLocation() {
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "permission denied", Toast.LENGTH_SHORT)
+                    .show();
+            return;
+        }
+        Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+        if (myLocation == null)
+        {
+            myLocation = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+        }
+    }
+
+
 
 
 
